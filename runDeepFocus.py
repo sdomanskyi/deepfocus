@@ -17,6 +17,7 @@ import os
 import glob
 import csv
 import argparse
+from tqdm import tqdm
 
 #version 1.0 generated on 6/15/2016
 import PIL.Image
@@ -42,7 +43,7 @@ def analyze(imgpath,model,outdir='output'):
     thumbnailGray = color.rgb2gray(thumbnail)
     val = filters.threshold_otsu(thumbnailGray)
     tissueMask = thumbnailGray < max(val,0.8)
-    plt.imsave(outdir + '/tissue.png', tissueMask) #save the thumb of tissue mask
+    plt.imsave(outdir + '/' + imgname + '.tissue.png', tissueMask) #save the thumb of tissue mask
 
     buffersize = kernelSize * bufferVal
     resultMask = thumbnail.astype(numpy.uint8) * 0
@@ -52,11 +53,10 @@ def analyze(imgpath,model,outdir='output'):
     counter2 = 0
     expectedStep = tissueMask.shape[0] / bufferVal
     outputsVec = []
-    for i in range(0,tissueMask.shape[0] - bufferVal,bufferVal): #Height
-
+    for i in tqdm(range(0,tissueMask.shape[0] - bufferVal,bufferVal)): #Height
         curMod = i % (bufferVal * max(5,int(expectedStep / 20)))
-        if curMod == 0:
-            print('.', end='', flush=True)
+        #if curMod == 0:
+        #    print('.', end='', flush=True)
         for j in range(0,tissueMask.shape[1] - bufferVal,bufferVal): #Width
 
             if np.mean(tissueMask[i:i + bufferVal,j:j + bufferVal]) < (8 / 16):  #most of them are background
@@ -71,7 +71,6 @@ def analyze(imgpath,model,outdir='output'):
             blocks = np.lib.stride_tricks.as_strided(bigTile, shape=shape, strides=strides)
             blocks = blocks.reshape(blocks.shape[0] * blocks.shape[1], blocks.shape[2], blocks.shape[3], blocks.shape[4])
             predictions = model.predict(blocks)
-            print(predictions.shape)
             outputsVec = outputsVec + predictions.tolist()
             qwe = np.array(predictions)
             qwe = qwe.reshape(int(h / bh / stepsize), int(w / bw / stepsize),2)
