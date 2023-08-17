@@ -88,14 +88,12 @@ def analyze(imgpath,model,outdir='output'):
     writeXML(outputname2, outputsVec)
     return (counter2,counter1)
 
-def main(wsifile, outdir):
+def main(wsifile, outdir, checkpointdir):
     params = hyperparameterModel.hyperparameterModel()
-    outputpath = ''
-    outputFile = outputpath + 'ver5'
     tflearn.init_graph()
     g = classificationModel3.createModel(params)
     model = tflearn.DNN(g)
-    model.load(outputFile)
+    model.load(checkpointdir + 'ver5')
 
     with open(outdir + '/outputlogs.txt', 'w') as f:
         results = analyze(wsifile, model, outdir=outdir)
@@ -108,7 +106,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--wsi-file', dest='wsifile', action='store', required=True)
     parser.add_argument('--output-dir', dest='outdir', action='store', required=True)
+    parser.add_argument('--checkpoint-dir', dest='checkpointdir', action='store', required=True)
 
     args = parser.parse_args()
 
-    main(args.wsifile, args.outdir)
+    main(args.wsifile, args.outdir, args.checkpointdir)
