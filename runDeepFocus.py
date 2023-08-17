@@ -95,9 +95,11 @@ def main(wsifile, outdir, checkpointdir):
     model = tflearn.DNN(g)
     model.load(checkpointdir + 'ver5')
 
-    with open(outdir + '/outputlogs.txt', 'w') as f:
-        results = analyze(wsifile, model, outdir=outdir)
-        f.write((wsifile + ' ' + str(results[0]) + ' ' + str(results[1]) + '\n'))
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    results = analyze(wsifile, model, outdir=outdir)
+
     return
 
 if __name__ == "__main__":
