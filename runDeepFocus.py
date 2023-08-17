@@ -16,6 +16,8 @@ import time
 import os
 import glob
 import csv
+import argparse
+
 #version 1.0 generated on 6/15/2016
 import PIL.Image
 PIL.Image.MAX_IMAGE_PIXELS = None
